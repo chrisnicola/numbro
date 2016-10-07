@@ -13,6 +13,8 @@
         Constants
     ************************************/
 
+    var POW10 = { _0: 1, _3: 1000, _6: 1000000, _9: 1000000000, _12: 1000000000000 };
+
     var numbro,
         VERSION = '1.9.3',
         binarySuffixes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
@@ -244,10 +246,10 @@
                 } else {
                     // do some math to create our number
                     n._value = ((bytesMultiplier) ? bytesMultiplier : 1) *
-                        ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) *
-                        ((stringOriginal.match(millionRegExp)) ? Math.pow(10, 6) : 1) *
-                        ((stringOriginal.match(billionRegExp)) ? Math.pow(10, 9) : 1) *
-                        ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) *
+                        ((stringOriginal.match(thousandRegExp)) ? POW10._3: 1) *
+                        ((stringOriginal.match(millionRegExp)) ? POW10._6: 1) *
+                        ((stringOriginal.match(billionRegExp)) ? POW10._9: 1) *
+                        ((stringOriginal.match(trillionRegExp)) ? POW10._12: 1) *
                         ((string.indexOf('%') > -1) ? 0.01 : 1) *
                         (((string.split('-').length +
                             Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) *
@@ -561,8 +563,11 @@
                 length = Math.floor(Math.log(abs) / Math.LN10) + 1 - intPrecision;
 
                 pow = 3 * ~~((Math.min(intPrecision, totalLength) - minimumPrecision) / 3);
-
-                abs = abs / Math.pow(10, pow);
+                if (pow <= 12) {
+                    abs = abs / POW10['_' + pow];
+                } else {
+                    abs = abs / Math.pow(10, pow);
+                }
 
                 if (format.indexOf('.') === -1 && intPrecision > 3) {
                     format += '[.]';
@@ -575,22 +580,22 @@
             }
 
             if (Math.floor(Math.log(Math.abs(value)) / Math.LN10) + 1 !== intPrecision) {
-                if (abs >= Math.pow(10, 12) && !abbrForce || abbrT) {
+                if (abs >= POW10._12 && !abbrForce || abbrT) {
                     // trillion
                     abbr = abbr + cultures[currentCulture].abbreviations.trillion;
-                    value = value / Math.pow(10, 12);
-                } else if (abs < Math.pow(10, 12) && abs >= Math.pow(10, 9) && !abbrForce || abbrB) {
+                    value = value / POW10._12;
+                } else if (abs < POW10._12 && abs >= POW10._9 && !abbrForce || abbrB) {
                     // billion
                     abbr = abbr + cultures[currentCulture].abbreviations.billion;
-                    value = value / Math.pow(10, 9);
-                } else if (abs < Math.pow(10, 9) && abs >= Math.pow(10, 6) && !abbrForce || abbrM) {
+                    value = value / POW10._9;
+                } else if (abs < POW10._9 && abs >= POW10._6 && !abbrForce || abbrM) {
                     // million
                     abbr = abbr + cultures[currentCulture].abbreviations.million;
-                    value = value / Math.pow(10, 6);
-                } else if (abs < Math.pow(10, 6) && abs >= Math.pow(10, 3) && !abbrForce || abbrK) {
+                    value = value / POW10._6;
+                } else if (abs < POW10._6 && abs >= POW10._3 && !abbrForce || abbrK) {
                     // thousand
                     abbr = abbr + cultures[currentCulture].abbreviations.thousand;
-                    value = value / Math.pow(10, 3);
+                    value = value / POW10._3;
                 }
             }
         }
