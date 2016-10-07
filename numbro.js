@@ -564,7 +564,7 @@
 
                 abs = abs / Math.pow(10, pow);
 
-                if (format.indexOf('.') === -1 && intPrecision > 3) {
+                if (format.indexOf('.') === -1) {
                     format += '[.]';
 
                     size = length === 0 ? 0 : 3 * ~~(length / 3) - length;
