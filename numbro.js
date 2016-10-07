@@ -80,6 +80,7 @@
     }
 
     function numberLength(number) {
+        if (number === 0) { return 1; }
         return Math.floor(Math.log(Math.abs(number)) / Math.LN10) + 1;
     }
 
