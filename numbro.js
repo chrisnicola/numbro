@@ -77,6 +77,10 @@
         this._value = number;
     }
 
+    function numberLength(number) {
+        return Math.floor(Math.log(Math.abs(number)) / Math.LN10) + 1;
+    }
+
     function zeroes(count) {
         var i, ret = '';
 
@@ -472,7 +476,6 @@
             forcedNeg = false,
             neg = false,
             indexOpenP,
-            size,
             indexMinus,
             paren = '',
             minlen,
@@ -551,30 +554,16 @@
                 format = format.replace('a', '');
             }
 
-            totalLength = Math.floor(Math.log(abs) / Math.LN10) + 1;
-
+            totalLength = numberLength(value);
             minimumPrecision = totalLength % 3;
             minimumPrecision = minimumPrecision === 0 ? 3 : minimumPrecision;
 
             if (intPrecision && abs !== 0) {
-
-                length = Math.floor(Math.log(abs) / Math.LN10) + 1 - intPrecision;
-
                 pow = 3 * ~~((Math.min(intPrecision, totalLength) - minimumPrecision) / 3);
-
                 abs = abs / Math.pow(10, pow);
-
-                if (format.indexOf('.') === -1) {
-                    format += '[.]';
-
-                    size = length === 0 ? 0 : 3 * ~~(length / 3) - length;
-                    size = size < 0 ? size + 3 : size;
-
-                    format += zeroes(size);
-                }
             }
 
-            if (Math.floor(Math.log(Math.abs(value)) / Math.LN10) + 1 !== intPrecision) {
+            if (totalLength !== intPrecision) {
                 if (abs >= Math.pow(10, 12) && !abbrForce || abbrT) {
                     // trillion
                     abbr = abbr + cultures[currentCulture].abbreviations.trillion;
@@ -592,6 +581,12 @@
                     abbr = abbr + cultures[currentCulture].abbreviations.thousand;
                     value = value / Math.pow(10, 3);
                 }
+            }
+
+            length = numberLength(value);
+            if (intPrecision && length < intPrecision && format.indexOf('.') === -1) {
+                format += '[.]';
+                format += zeroes(intPrecision - length);
             }
         }
 
